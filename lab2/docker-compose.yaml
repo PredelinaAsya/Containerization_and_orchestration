@@ -1,0 +1,69 @@
+version: "3.9"
+services:
+  init_db:
+    command: sh ./db_init.sh
+    image: custom_init_db
+    build:
+      context: .
+      dockerfile: ./db_init.Dockerfile
+    depends_on:
+      - mongodb
+    networks:
+      - main
+
+  mongodb:
+    image: mongo:4.2.24-bionic
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_INITDB_ROOT_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_INITDB_ROOT_PASSWORD
+    volumes:
+      - ./mongo:/data/db
+    networks:
+      - main
+
+  mongo-express:
+    image: mongo-express:1.0.2-20-alpine3.19
+    container_name: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: $MONGO_INITDB_ROOT_USERNAME
+      ME_CONFIG_MONGODB_ADMINPASSWORD: $MONGO_INITDB_ROOT_PASSWORD
+      ME_CONFIG_MONGODB_SERVER: "mongodb"
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - main
+    depends_on:
+      - mongodb
+
+  jupyter_lab:
+    build: .
+    container_name: jupyter_lab
+    image: custom_jupyter_lab
+    environment:
+      DB_URL: mongodb
+      JUPYTERLAB_PORT: $JUPYTERLAB_PORT
+    volumes:
+      - ./jupyter_lab:/home/jovyan/
+    ports:
+      - 8888:$JUPYTERLAB_PORT
+    networks:
+      - main
+    depends_on:
+      - mongodb
+      - init_db
+    healthcheck:
+      test: "curl -f http://localhost:$JUPYTERLAB_PORT"
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  
+networks:
+  main:
+    name: custom_network
