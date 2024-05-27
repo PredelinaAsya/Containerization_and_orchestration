@@ -40,6 +40,7 @@ services:
     networks:
       - main
     depends_on:
+      - init_db
       - mongodb
 
   jupyter_lab:
@@ -56,8 +57,8 @@ services:
     networks:
       - main
     depends_on:
-      - mongodb
       - init_db
+      - mongodb
     healthcheck:
       test: "curl -f http://localhost:$JUPYTERLAB_PORT"
       interval: 30s
