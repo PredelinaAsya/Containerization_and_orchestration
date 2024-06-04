@@ -10,38 +10,42 @@ services:
       - mongodb
     networks:
       - main
+    env_file:
+      - .env
 
   mongodb:
     image: mongo:4.2.24-bionic
     container_name: mongodb
     restart: always
     ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: $MONGO_INITDB_ROOT_USERNAME
-      MONGO_INITDB_ROOT_PASSWORD: $MONGO_INITDB_ROOT_PASSWORD
+      - $MONGODB_EXTERNAL_PORT:27017
     volumes:
       - ./mongo:/data/db
     networks:
       - main
+    env_file:
+      - .env
 
   mongo-express:
     image: mongo-express:1.0.2-20-alpine3.19
     container_name: mongo-express
     restart: always
     ports:
-      - 8081:8081
+      - $MONGO_EXPRESS_EXTERNAL_PORT:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: $MONGO_INITDB_ROOT_USERNAME
-      ME_CONFIG_MONGODB_ADMINPASSWORD: $MONGO_INITDB_ROOT_PASSWORD
-      ME_CONFIG_MONGODB_SERVER: "mongodb"
+      ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       ME_CONFIG_BASICAUTH: false
     networks:
       - main
     depends_on:
       - init_db
       - mongodb
+    env_file:
+      - .env
 
   jupyter_lab:
     build: .
@@ -49,11 +53,10 @@ services:
     image: custom_jupyter_lab
     environment:
       DB_URL: mongodb
-      JUPYTERLAB_PORT: $JUPYTERLAB_PORT
     volumes:
       - ./jupyter_lab:/home/jovyan/
     ports:
-      - 8888:$JUPYTERLAB_PORT
+      - $JUPYTERLAB_EXTERNAL_PORT:$JUPYTERLAB_PORT
     networks:
       - main
     depends_on:
@@ -64,6 +67,8 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
+    env_file:
+      - .env
   
 networks:
   main:
