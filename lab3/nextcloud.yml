@@ -15,6 +15,7 @@ metadata:
   labels:
     app: nextcloud
 data:
+  POSTGRES_HOST: postgres-service
   NEXTCLOUD_UPDATE: "1"
   ALLOW_EMPTY_PASSWORD: "yes"
   NEXTCLOUD_TRUSTED_DOMAINS: "127.0.0.1"
@@ -38,7 +39,7 @@ spec:
     spec:
       containers:
       - name: nextcloud
-        image: mirror.gcr.io/nextcloud:stable-apache
+        image: docker.io/nextcloud:stable-apache
         resources:
           limits:
             cpu: 500m
@@ -76,13 +77,13 @@ spec:
         imagePullPolicy: IfNotPresent
         readinessProbe:
           httpGet:
-            path: /status.php
+            path: /
             port: 80
           initialDelaySeconds: 120
           periodSeconds: 10
         livenessProbe:
           httpGet:
-            path: /status.php
+            path: /
             port: 80
           initialDelaySeconds: 60
           periodSeconds: 10

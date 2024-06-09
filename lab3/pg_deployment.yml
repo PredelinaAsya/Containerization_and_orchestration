@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: postgres-container
-          image: mirror.gcr.io/postgres:14
+          image: docker.io/postgres:14
           resources:
             limits:
               cpu: 200m
@@ -28,3 +28,5 @@ spec:
           envFrom:
             - configMapRef:
                 name: postgres-configmap
+            - secretRef:
+                name: postgres-secret

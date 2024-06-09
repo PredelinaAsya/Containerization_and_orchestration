@@ -20,7 +20,7 @@
 
     ![](screens/create_nextcloud.JPG)
 
-4. Проверка того, что поды были успешно запущены. Тут запустилось не сразу: но после изменения docker-образов на образы с зеркала, всё получилось:
+4. Проверка того, что поды были успешно запущены:
 
     ![](screens/running_pods.JPG)
 
@@ -47,6 +47,26 @@
     ![](screens/final_describe_nextcloud.JPG)
 
     ![](screens/final_describe_nextcloud_1.JPG)
+
+### Запуск итогового сервиса
+
+- осуществляется последовательным запуском следующих команд:
+
+    ```
+    kubectl create -f  pg_configmap.yml
+    kubectl create -f  pg_secret.yml
+    kubectl create -f  pg_service.yml
+    kubectl create -f  pg_deployment.yml
+    kubectl create -f  nextcloud.yml
+    ```
+
+- финальная проверка подов:
+
+    ![](screens/upd_deploy.JPG)
+
+- дашборд из дополнительного задания:
+
+    ![](screens/kuber_dashboard.JPG)
 
 ## Ответы на вопросы
 
