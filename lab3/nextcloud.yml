@@ -52,8 +52,6 @@ spec:
           containerPort: 80
           protocol: TCP
         env:
-        - name: POSTGRES_HOST
-          value: postgres-service
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
