@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        env: prod
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:4.2.24-bionic
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 27017
+          envFrom:
+            - secretRef:
+                name: mongo-secret
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongo-vol
+      initContainers:
+        - name: mongodb-init
+          image: custom_mongo_init
+          imagePullPolicy: Never
+          command: ["sh", "-c", "./db_init.sh"]
+      volumes:
+        - name: mongo-vol
+          emptyDir:
+            sizeLimit: 500Mi

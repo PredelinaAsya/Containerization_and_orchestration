@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jupyter-lab-configmap
+  labels:
+    app: jupyter_lab
+data:
+  JUPYTERLAB_PORT: "80"

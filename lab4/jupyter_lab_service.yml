@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jupyter-lab-service
+  labels:
+    app: jupyter_lab
+spec:
+  type: NodePort
+  ports:
+    - name: jupyter-lab-port
+      protocol: TCP
+      port: 80
+      targetPort: jupyter-lab
+  selector:
+    app: jupyter_lab

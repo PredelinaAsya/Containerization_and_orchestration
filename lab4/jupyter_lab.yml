@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter_lab
+  template:
+    metadata:
+      labels:
+        app: jupyter_lab
+        env: prod
+    spec:
+      containers:
+        - name: jupyter-lab
+          image: jupyter_lab
+          imagePullPolicy: Never
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          ports:
+            - containerPort: 80
+              name: jupyter-lab
+          envFrom:
+            - secretRef:
+                name: mongo-secret
+            - configMapRef:
+                name: jupyter-lab-configmap
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 120
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
